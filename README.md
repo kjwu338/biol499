@@ -20,7 +20,7 @@ Here is the table of contents:
 - [biol499scripte1_TRYdataextraction.R](./1_scripts/biol499scripte1_TRYdataextraction.R) Extraction of trait data from the TRY database
 - [biol499scripte2_mergingseed.R](./1_scripts/biol499scripte2_mergingseed.R) Merging seed datasets for final analysis
 - [spec_accum_curve.R](./1_scripts/spec_accum_curve.R) Species accumulation curve generation
-- 
+  
 `2_data_raw/`
 - **[gc_seedlingdata.csv](./2_data_raw/gc_seedlingdata)**
 - **[fs_summerveg.csv](./2_data_raw/fs_summerveg.csv)**
