@@ -1,0 +1,40 @@
+﻿unique_id,Species,final_mass,final_length,Seed dry mass,Seed length mm,Seed width,Seed shape,ser_seedweight(g),RAM weight g,govbc_native seed weight (g),dispersal unit appendages,length_mw,width_mw,shape_mw
+30,Agrostis scabra,0.051833333,1.15,0.051833333,n/a,n/a,n/a,0.08,,,TRUE,1.15,,elliptic
+18,Androsace occidentalis,0.27,n/a,n/a,n/a,n/a,n/a,0.27,,,FALSE,,,round
+15,Androsace septentrionalis,0.175822222,1.1125,0.175822222,1.1125,0.56,n/a,0.18,,,,,,round
+4,Artemisia frigida,0.078224,n/a,0.078224,n/a,n/a,n/a,0.09,0.0001,,,,,
+3,Bassia scoparia,0.36,1.756666667,1.33254,1.756666667,1.24,0.121464017,0.36,,,TRUE,1.6,,oval
+39,Calamagrostis canadensis,0.32,1,n/a,n/a,n/a,n/a,0.32,,0.0653,TRUE,1,,oblong
+13,Carex duriuscula,n/a,1.75,n/a,n/a,n/a,n/a,,,,TRUE,1.75,1.5,
+19,Carex inops subsp. heliophila,2.48,2.05,2.48,n/a,n/a,n/a,2.48,,,,2.05,1.85,
+17,Carex praegracilis,0.53248,1.75,0.53248,n/a,n/a,n/a,0.56,,,,1.75,0.95,
+22,Carex spp.,n/a,1.844774639,n/a,n/a,n/a,n/a,,,,,1.844774639,,
+32,Chamaerhodos erecta,0.18,n/a,n/a,n/a,n/a,n/a,0.18,,,,,,
+1,Chenopodium leptophyllum,0.4796,n/a,0.4796,n/a,n/a,n/a,0.47,,,,,,
+23,Crepis tectorum,0.2688,3.05,0.2688,3.05,n/a,n/a,0.27,,,TRUE,,,
+29,Drymocallis arguta,0.16,n/a,n/a,n/a,n/a,n/a,0.16,,,,,,
+38,Erysimum inconspicuum,0.0016,n/a,n/a,n/a,n/a,n/a,,0.0016,,,,,
+5,Fallopia convolvulus,5.9125,3.63625,5.9125,3.63625,2.504166667,0.045158808,5.84,,,TRUE,,,
+34,Festuca saximontana,0.667,n/a,n/a,n/a,n/a,n/a,,,0.667,,,,
+8,Gnaphalium uliginosum,0.021263158,0.55,0.021263158,0.55,n/a,n/a,0.01,,,,,,
+12,Hesperostipa comata,6.52,3,n/a,n/a,n/a,n/a,6.52,,,TRUE,3,,linear
+20,Juncus balticus,0.056424615,0.9,0.056424615,0.9,0.426666667,n/a,0.05,,,TRUE,0.7,,elliptic
+36,Juncus bufonius,0.02,0.45,n/a,n/a,n/a,n/a,0.02,,,TRUE,0.45,,oval-elliptic
+9,Koeleria macrantha,0.426332222,2.855555556,0.426332222,2.855555556,n/a,0.1661824,0.32,,,,2.75,,
+27,Lepidium densifolium,0.79,n/a,n/a,n/a,n/a,n/a,0.79,,,,,,
+37,Oenothera biennis/villosa,0.42,1,n/a,n/a,n/a,n/a,0.42,0.003,,,1,,Angular
+11,Plantago major,0.194217436,1.393125,0.194217436,1.393125,1.93,0.228021381,0.19,,,TRUE,,,
+10,Poa compressa,0.209476923,2.525,0.209476923,2.525,0.5,n/a,0.21,,,TRUE,1.5,,
+21,Poa palustris,0.184111111,n/a,0.184111111,n/a,0.78,1.15,0.18,,,,,,
+14,Poa pratensis,0.284671429,1.707142857,0.284671429,1.707142857,0.593545455,0.11771872,0.31,,,,,,
+25,Potentilla norvegica,0.110714286,1.05,0.110714286,1.05,n/a,n/a,0.11,,,,,,
+33,Potentilla pensylvanica,0.1528,1.2,0.1528,n/a,n/a,n/a,0.21,,,,1.2,,
+24,Potentilla rivalis,0.04,n/a,n/a,n/a,n/a,n/a,0.04,,,,,,
+28,Silene latifolia,0.81,1,n/a,n/a,n/a,n/a,0.81,,,,1,,kidney shaped
+31,Sonchus asper,0.28,,n/a,n/a,n/a,n/a,0.28,,,,,,
+7,Sporobolus cryptandrus,0.119066667,0.975,0.119066667,n/a,n/a,n/a,0.12,,,TRUE,0.975,,
+6,Suaeda calceoliformis,0.3208,1.25,0.3208,n/a,n/a,n/a,0.32,,,,1.25,,round to egg-shape
+2,Thlaspi arvense,1.02,n/a,n/a,n/a,n/a,n/a,1.02,,,,,,
+26,Trifolium hybridum,0.74,n/a,n/a,n/a,n/a,n/a,0.74,,,,,,
+16,Typha latifolia,0.139455126,3.131,0.139455126,3.131,2.195,n/a,0.09,,,,,,
+35,Veronica peregrina,0.032090909,0.733333333,0.032090909,0.733333333,0.45,n/a,0.03,,,,,,
