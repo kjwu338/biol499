@@ -17,9 +17,10 @@ Here is the table of contents:
 - [spec_accum_curve.R](./1_scripts/spec_accum_curve.R) Species accumulation curve generation 
 
 `2_data_raw/`
-* `fs_biocrustanalysis_v2.csv`
-* `fs_summerveg.csv`
-* `gc_seedlingdata.csv`
+- [gc_seedlingdata.csv](./2_data_raw/gc_seedlingdata)
+- [fs_summerveg.csv](./2_data_raw/fs_summerveg.csv)
+* fs = field survey
+* gc = growth chamber 
 
 `6_manualediting`
 - [gc_seedtraitsfinal.csv](./6_manualediting/gc_seedtraitsfinal.csv) Generation of trait-related plots and figures
