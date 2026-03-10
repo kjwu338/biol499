@@ -3,9 +3,7 @@ This is the code for my BIOL 499 Project. It includes scripts, raw data and extr
 Here is the table of contents: 
 
 `1_scripts/`
-| File Name | Description |
-| :--- | :--- |
-| [biol499script1_gccleandata.R](./1_scripts/biol499script1_gccleandata.R) | Initial data cleaning and descriptive analysis |
+- [biol499script1_gccleandata.R](./1_scripts/biol499script1_gccleandata.R) Initial data cleaning and descriptive analysis 
 | [biol499script2_cleanseedtraitforuse.R](./1_scripts/biol499script2_cleanseedtraitforuse.R) | Processing and cleaning seed trait data |
 | [biol499script3_v2_traitanalysis.R](./1_scripts/biol499script3_v2_traitanalysis.R) | Statistical analysis of plant traits |
 | [biol499script3_v2_traitvisualization.R](./1_scripts/biol499script3_v2_traitvisualization.R) | Generation of trait-related plots and figures |
