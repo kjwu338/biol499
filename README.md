@@ -24,6 +24,8 @@ Here is the table of contents:
 - **[gc_seedlingdata.csv](./2_data_raw/gc_seedlingdata)**
 - **[fs_summerveg.csv](./2_data_raw/fs_summerveg.csv)**
 
+`5_outputtables`
+-**[gc_wcategories.csv](./5_outputtables/gc_wcategories.csv)** OUTPUT from biol499script1_gccleandata.R; used for scripts 3 and 4
 `6_manualediting`
 - [gc_seedtraitsfinal.csv](./6_manualediting/gc_seedtraitsfinal.csv) Generation of trait-related plots and figures
 - [gcspeciestraits_edited.csv](./6_manualediting/gcspeciestraits_edited.csv) Generation of trait-related plots and figures
