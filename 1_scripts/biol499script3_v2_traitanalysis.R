@@ -31,7 +31,7 @@ seedlingdf_clean <- seedlingdf %>%
          final_length = as.numeric(final_length))
 
 merged_seedling_traits <- gcseedling %>%
-  left_join(seedlingdf_clean, by = c("species" = "Species")) %>% 
+  left_join(seedlingdf_clean, by = c("Species" = "Species")) %>% 
   filter(microsite_condition != "double_control") %>% 
   mutate(
     surface_depth = case_match(surface_depth, 
@@ -55,7 +55,7 @@ trait_descriptive_stats <- merged_seedling_traits %>%
 
 # Community Weighted Means (CWM)
 cwm_tray <- merged_seedling_traits %>%
-  group_by(tray, site, microsite_condition, surface_depth) %>%
+  group_by(Tray.., site, microsite_condition, surface_depth) %>%
   summarise(cwm_mass = mean(final_mass, na.rm = TRUE),
             cwm_length = mean(final_length, na.rm = TRUE), .groups = "drop")
 
@@ -74,7 +74,7 @@ ks_result_mass <- ks.test(dung_mass_dist, biocrust_mass_dist)
 # Full Models
 #model_mass <- lmer(final_mass ~ microsite_condition * surface_depth + (1 | site/tray), data = merged_seedling_traits)
 #model_length <- lmer(final_length ~ microsite_condition * surface_depth + (1 | site/tray), data = merged_seedling_traits)
-model_mass <- glmmTMB(final_mass ~ microsite_condition * surface_depth + (1 | site/tray),
+model_mass <- glmmTMB(final_mass ~ microsite_condition * surface_depth + (1 | site/Tray..),
         data = merged_seedling_traits,
         family = Gamma(link = "log"))
 

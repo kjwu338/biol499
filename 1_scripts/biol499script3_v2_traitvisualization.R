@@ -60,3 +60,4 @@ ggplot(cwm_plot_data, aes(x = microsite_condition, y = mean_cwm, fill = microsit
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", "dung" = "#C4944A", "control" = "#D4C09A")) +
   labs(y = "CWM Seed Mass (g)", x = NULL) +
   theme_classic() + theme(axis.text.x = element_blank(), legend.position = "bottom")
+

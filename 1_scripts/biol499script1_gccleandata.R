@@ -1,8 +1,8 @@
 ##
 #BIOL 499 GC Script 1: Clean Data & Descriptive Analysis
 #Date: 2/11/2026
-#Description:
-#Author: 
+#Description: 
+#Author: Kelly Wu 
 ##
 
 # load packages
@@ -19,7 +19,7 @@ df <- df %>%
 
 # Split the sample column into three columns and deal with double control 
 df_cleaned <- df %>%
-  separate("sample", 
+  separate("Sample", 
            into = c("site", "microsite_condition", "surface_depth"), 
            sep = "-", 
            remove = FALSE) %>% #keep original
@@ -83,6 +83,7 @@ intx_trays <- df_cleannames %>%
     seedling_count = n(), 
     species_count = n_distinct(Species)) %>%
   arrange(desc(tray_num))
+
 print(intx_trays)
 
 write.csv(intx_trays, "5_outputtables/intx_trays.csv")
