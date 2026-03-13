@@ -32,36 +32,48 @@ letter_pos <- tray_normal %>%
 # Join letters to their positions
 emm_letters <- left_join(emm_letters, letter_pos, by = c("microsite_condition", "surface_depth"))
 
+depth_order <- c("surface", "0-5", "5-10")
+micro_order <- c("dung","biocrust", "control")
+
 # STEP 3: create the plot 
 ggplot(tray_normal, aes(x = microsite_condition, y = total_seeds, fill = microsite_condition)) +
   # Whiskers
   stat_boxplot(geom = "errorbar", width = 0.25) +
-  # Main boxplot (outliers shown as open circles)
+  
+  # Main boxplot
   geom_boxplot(outlier.shape = 21, width = 0.6, alpha = 0.8) +
+  
   # Significance Letters
   geom_text(data = emm_letters, 
             aes(x = microsite_condition, y = y_pos, label = .group),
-            size = 4.5, fontface = "bold", vjust = 0) +
-  # Faceting by Depth
+            size = 5, fontface = "bold", vjust = 1) +
+  
+  # Faceting by Depth (Order is now fixed by Step 1)
   facet_wrap(~ surface_depth, nrow = 1,
              labeller = labeller(surface_depth = c("surface" = "Surface", 
                                                    "0-5" = "0-5 cm", 
                                                    "5-10" = "5-10 cm"))) +
-  # Professional Colors
+  
+  # Professional Colors (Ordered to match the factor levels)
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
                                "dung" = "#C4944A", 
                                "control" = "#D4C09A"),
-                    labels = c("Biocrust", "Dung", "Control")) +
-  # Labels
+                    labels = c("Dung", "Biocrust", "Control")) +
+  
+  # Labels and Visual Polish
   labs(x = NULL, 
        y = "Seedling Count (per tray)", 
        fill = "Microsite") +
   theme_classic() +
-  theme(strip.background = element_blank(),
-        strip.text = element_text(face = "bold", size = 12),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        legend.position = "bottom")
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold", size = 13),
+    axis.text.x = element_blank(),   # Hides labels since colors/legend tell the story
+    axis.ticks.x = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    text = element_text(size = 12)
+  )
 
 # Richness visualization -----
 
@@ -85,33 +97,48 @@ letter_pos_rich <- tray_richness %>%
 emm_rich_letters <- left_join(emm_rich_letters, letter_pos_rich, 
                               by = c("microsite_condition", "surface_depth"))
 
+depth_order <- c("surface", "0-5", "5-10")
+micro_order <- c("dung", "biocrust", "control")
+
 # STEP 3: plot richness
 ggplot(tray_richness, aes(x = microsite_condition, y = richness, fill = microsite_condition)) +
-  # whisker bars
+  # Whisker bars
   stat_boxplot(geom = "errorbar", width = 0.25) +
-  # boxplot
+  
+  # Boxplot
   geom_boxplot(outlier.shape = 21, width = 0.6, alpha = 0.8) +
-  # letters
+  
+  # Significance Letters
   geom_text(data = emm_rich_letters, 
             aes(x = microsite_condition, y = y_pos, label = .group),
-            size = 4.5, fontface = "bold", vjust = 0) +
-  # split data into subplots
+            size = 5, fontface = "bold", vjust = 1) +
+  
+  # Split data into subplots (Faceting)
   facet_wrap(~ surface_depth, nrow = 1,
-             labeller = labeller(surface_depth = c(
-               "surface" = "Surface",
-               "0-5"     = "0-5 cm",
-               "5-10"    = "5-10 cm"))) +
+             labeller = labeller(surface_depth = c("surface" = "Surface",
+                                                   "0-5"     = "0-5 cm",
+                                                   "5-10"    = "5-10 cm"))) +
+  
+  # Professional Colors (Matches the Seed Count plot)
   scale_fill_manual(values = c("biocrust" = "#8B9E6B",
                                "dung"      = "#C4944A",
                                "control"   = "#D4C09A"),
-                    labels = c("Biocrust", "Dung", "Control")) +
-  labs(x = NULL, y = "Number of Species", fill = "Microsite") +
+                    labels = c("Dung", "Biocrust", "Control")) +
+  
+  # Labels and Polish
+  labs(x = NULL, 
+       y = "Number of Species", 
+       fill = "Microsite") +
   theme_classic() +
-  theme(strip.background = element_blank(),
-        strip.text = element_text(face = "bold", size = 12),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        legend.position = "bottom")
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold", size = 13),
+    axis.text.x = element_blank(),   
+    axis.ticks.x = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    text = element_text(size = 12)
+  )
 
 # EVENNESS------
 
@@ -156,7 +183,7 @@ ggplot(tray_evenness %>% filter(!is.na(evenness)),
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
                                "dung" = "#C4944A", 
                                "control" = "#D4C09A"),
-                    labels = c("Biocrust", "Dung", "Control")) +
+                    labels = c("Biocrust", "Control", "Dung")) +
   # keeps scale clean
   scale_y_continuous(limits = c(0, 1.15), breaks = seq(0, 1, 0.2)) +
   labs(x = NULL, y = "Pielou's Evenness (J)", fill = "Microsite") +

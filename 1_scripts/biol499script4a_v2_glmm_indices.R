@@ -53,7 +53,7 @@ all_trays <- expand_grid(
 # not normalizing abundance by volume (15.71) bc surface treatments are not standarized ----
 # aggregate seedling counts by trays
 tray_counts <- gc_clean %>%
-  group_by(tray, site, microsite_condition, surface_depth) %>%
+  group_by(Tray.., site, microsite_condition, surface_depth) %>%
   summarise(total_seeds = n(), .groups = "drop") #drop grouping structure
 
 tray_normal <- all_trays %>%
@@ -110,7 +110,7 @@ testDispersion(simulationOutput)
 
 richness_counts <- gc_clean %>%
   group_by(site, microsite_condition, surface_depth) %>%
-  summarise(richness = n_distinct(species), .groups = "drop")
+  summarise(richness = n_distinct(Species), .groups = "drop")
 
 tray_richness <- all_trays %>%
   left_join(richness_counts, by = c("site", "microsite_condition", "surface_depth")) %>%
@@ -136,7 +136,7 @@ plot(sim_richness)
 # STEP 1: calculate shannon h for pielou’s j (evenness) ----
 evenness_calc <- gc_clean %>%
   # grouping 
-  group_by(site, microsite_condition, surface_depth, species) %>% 
+  group_by(site, microsite_condition, surface_depth, Species) %>% 
   # identifying species 
   summarise(sp_count = n(), .groups = "drop_last") %>%
   # calculates relative abundance
@@ -186,3 +186,4 @@ Anova(model_evenness, type = "III")
 # STEP 4: check assumptions ----
 sim_evenness <- simulateResiduals(model_evenness)
 plot(sim_evenness) # good enough
+
