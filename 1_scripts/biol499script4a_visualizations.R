@@ -37,30 +37,30 @@ micro_order <- c("dung","biocrust", "control")
 
 # STEP 3: create the plot 
 ggplot(tray_normal, aes(x = microsite_condition, y = total_seeds, fill = microsite_condition)) +
-  # Whiskers
+  # whiskers
   stat_boxplot(geom = "errorbar", width = 0.25) +
   
-  # Main boxplot
+  # boxplot
   geom_boxplot(outlier.shape = 21, width = 0.6, alpha = 0.8) +
   
-  # Significance Letters
+  # letter
   geom_text(data = emm_letters, 
             aes(x = microsite_condition, y = y_pos, label = .group),
             size = 5, fontface = "bold", vjust = 1) +
   
-  # Faceting by Depth (Order is now fixed by Step 1)
+  # faceting
   facet_wrap(~ surface_depth, nrow = 1,
              labeller = labeller(surface_depth = c("surface" = "Surface", 
                                                    "0-5" = "0-5 cm", 
                                                    "5-10" = "5-10 cm"))) +
   
-  # Professional Colors (Ordered to match the factor levels)
+  # color
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
                                "dung" = "#C4944A", 
                                "control" = "#D4C09A"),
                     labels = c("Dung", "Biocrust", "Control")) +
   
-  # Labels and Visual Polish
+  # label
   labs(x = NULL, 
        y = "Seedling Count (per tray)", 
        fill = "Microsite") +
@@ -82,7 +82,7 @@ ggplot(tray_normal, aes(x = microsite_condition, y = total_seeds, fill = microsi
 emm_rich <- emmeans(model_richness, ~ treatment, type = "response")
 emm_rich_letters <- as.data.frame(cld(emm_rich, Letters = letters, adjust = "tukey")) %>%
   mutate(.group = trimws(.group)) %>%
-  # SPLIT the treatment back into two columns for the plot facets and fill
+  # split treatment
   separate(treatment, into = c("microsite_condition", "surface_depth"), sep = "_") %>%
   mutate(
     surface_depth = factor(surface_depth, levels = c("surface", "0-5", "5-10")),
@@ -102,30 +102,29 @@ micro_order <- c("dung", "biocrust", "control")
 
 # STEP 3: plot richness
 ggplot(tray_richness, aes(x = microsite_condition, y = richness, fill = microsite_condition)) +
-  # Whisker bars
+  # bars
   stat_boxplot(geom = "errorbar", width = 0.25) +
   
-  # Boxplot
+  # boxplot
   geom_boxplot(outlier.shape = 21, width = 0.6, alpha = 0.8) +
   
-  # Significance Letters
+  # letters
   geom_text(data = emm_rich_letters, 
             aes(x = microsite_condition, y = y_pos, label = .group),
             size = 5, fontface = "bold", vjust = 1) +
   
-  # Split data into subplots (Faceting)
+  # subplots
   facet_wrap(~ surface_depth, nrow = 1,
              labeller = labeller(surface_depth = c("surface" = "Surface",
                                                    "0-5"     = "0-5 cm",
                                                    "5-10"    = "5-10 cm"))) +
   
-  # Professional Colors (Matches the Seed Count plot)
+  # color
   scale_fill_manual(values = c("biocrust" = "#8B9E6B",
                                "dung"      = "#C4944A",
                                "control"   = "#D4C09A"),
                     labels = c("Dung", "Biocrust", "Control")) +
   
-  # Labels and Polish
   labs(x = NULL, 
        y = "Number of Species", 
        fill = "Microsite") +
