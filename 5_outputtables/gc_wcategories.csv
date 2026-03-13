@@ -1,9 +1,9 @@
-"","tray","sample","site","microsite_condition","surface_depth","species","double_control"
+"","Tray..","Sample","site","microsite_condition","surface_depth","Species","double_control"
 "1",110,"14-D-5","14","dung","5-10","Chenopodium leptophyllum",FALSE
 "2",108,"14-D-S","14","dung","surface","Chenopodium leptophyllum",FALSE
-"3",92,"12-D-S","12","dung","surface","Chenopodium leptophyllum",FALSE
+"3",92,"12-B-S","12","biocrust","surface","Chenopodium leptophyllum",FALSE
 "4",161,"C1","C1","double_control","double_control","Thlaspi arvense",TRUE
-"5",93,"12-D-0","12","dung","0-5","Chenopodium leptophyllum",FALSE
+"5",93,"12-B-0","12","biocrust","0-5","Chenopodium leptophyllum",FALSE
 "6",36,"5-D-S","5","dung","surface","Chenopodium leptophyllum",FALSE
 "7",132,"17-D-S","17","dung","surface","Bassia scoparia",FALSE
 "8",37,"5-D-0","5","dung","0-5","Artemisia frigida",FALSE
@@ -93,7 +93,7 @@
 "92",92,"12-D-S","12","dung","surface","Koeleria macrantha",FALSE
 "93",92,"12-D-S","12","dung","surface","Sporobolus cryptandrus",FALSE
 "94",151,"19-C-0","19","control","0-5","Koeleria macrantha",FALSE
-"95",92,"12-D-S","12","dung","surface","Chenopodium leptophyllum",FALSE
+"95",92,"12-B-5","12","biocrust","5-10","Chenopodium leptophyllum",FALSE
 "96",37,"5-D-0","5","dung","0-5","Gnaphalium uliginosum",FALSE
 "97",28,"4-D-S","4","dung","surface","Carex duriuscula",FALSE
 "98",28,"4-D-S","4","dung","surface","Carex duriuscula",FALSE
@@ -130,7 +130,7 @@
 "129",4,"1-D-S","1","dung","surface","Carex duriuscula",FALSE
 "130",4,"1-D-S","1","dung","surface","Carex duriuscula",FALSE
 "131",76,"10-D-S","10","dung","surface","Carex duriuscula",FALSE
-"132",103,"13-C-0","13","control","0-5","Androsace occidentialis",FALSE
+"132",103,"13-C-0","13","control","0-5","Androsace occidentalis",FALSE
 "133",53,"7-D-0","7","dung","0-5","Typha latifolia",FALSE
 "134",124,"16-D-S","16","dung","surface","Carex duriuscula",FALSE
 "135",124,"16-D-S","16","dung","surface","Carex duriuscula",FALSE
@@ -218,8 +218,8 @@
 "217",108,"14-D-S","14","dung","surface","Poa pratensis",FALSE
 "218",108,"14-D-S","14","dung","surface","Poa pratensis",FALSE
 "219",108,"14-D-S","14","dung","surface","Poa pratensis",FALSE
-"220",148,"19-D-S","19","dung","surface","Carex spp. ",FALSE
-"221",148,"19-D-S","19","dung","surface","Carex spp. ",FALSE
+"220",148,"19-D-S","19","dung","surface","Carex spp.",FALSE
+"221",148,"19-D-S","19","dung","surface","Carex spp.",FALSE
 "222",148,"19-D-S","19","dung","surface","Juncus balticus",FALSE
 "223",148,"19-D-S","19","dung","surface","Juncus balticus",FALSE
 "224",36,"5-D-S","5","dung","surface","Poa pratensis",FALSE
@@ -246,7 +246,7 @@
 "245",20,"3-D-S","3","dung","surface","Poa pratensis",FALSE
 "246",20,"3-D-S","3","dung","surface","Poa pratensis",FALSE
 "247",20,"3-D-S","3","dung","surface","Poa pratensis",FALSE
-"248",56,"7-C-5","7","control","5-10","Crepis tectorum ",FALSE
+"248",56,"7-C-5","7","control","5-10","Crepis tectorum",FALSE
 "249",8,"1-C-5","1","control","5-10","Carex duriuscula",FALSE
 "250",13,"2-D-0","2","dung","0-5","Carex duriuscula",FALSE
 "251",97,"13-B-S","13","biocrust","surface","Carex duriuscula",FALSE
@@ -254,7 +254,7 @@
 "253",9,"2-B-S","2","biocrust","surface","Carex duriuscula",FALSE
 "254",17,"3-B-S","3","biocrust","surface","Carex duriuscula",FALSE
 "255",17,"3-B-S","3","biocrust","surface","Carex duriuscula",FALSE
-"256",52,"7-D-S","7","dung","surface","Crepis tectorum ",FALSE
+"256",52,"7-D-S","7","dung","surface","Crepis tectorum",FALSE
 "257",52,"7-D-S","7","dung","surface","Juncus balticus",FALSE
 "258",84,"11-D-S","11","dung","surface","Juncus balticus",FALSE
 "259",84,"11-D-S","11","dung","surface","Juncus balticus",FALSE
@@ -305,7 +305,7 @@
 "304",74,"10-B-0","10","biocrust","0-5","Juncus balticus",FALSE
 "305",74,"10-B-0","10","biocrust","0-5","Juncus balticus",FALSE
 "306",68,"9-D-S","9","dung","surface","Juncus balticus",FALSE
-"307",69,"9-D-0","9","dung","0-5","Potentilla riveralis",FALSE
+"307",69,"9-D-0","9","dung","0-5","Potentilla rivalis",FALSE
 "308",48,"6-C-5","6","control","5-10","Potentilla norvegica",FALSE
 "309",61,"8-D-0","8","dung","0-5","Potentilla norvegica",FALSE
 "310",61,"8-D-0","8","dung","0-5","Potentilla norvegica",FALSE
@@ -344,7 +344,7 @@
 "343",153,"20-B-S","20","biocrust","surface","Koeleria macrantha",FALSE
 "344",153,"20-B-S","20","biocrust","surface","Koeleria macrantha",FALSE
 "345",153,"20-B-S","20","biocrust","surface","Koeleria macrantha",FALSE
-"346",106,"14-B-0","14","biocrust","0-5","Lepidium densifolium ",FALSE
+"346",106,"14-B-0","14","biocrust","0-5","Lepidium densifolium",FALSE
 "347",56,"7-C-5","7","control","5-10","Silene latifolia",FALSE
 "348",69,"9-D-0","9","dung","0-5","Poa pratensis",FALSE
 "349",84,"11-D-S","11","dung","surface","Poa pratensis",FALSE
@@ -364,13 +364,17 @@
 "363",63,"8-C-0","8","control","0-5","Festuca saximontana",FALSE
 "364",55,"7-C-0","7","control","0-5","Veronica peregrina",FALSE
 "365",43,"6-B-5","6","biocrust","5-10","Veronica peregrina",FALSE
-"366",105,"14-B-S","14","biocrust","surface","Lepidium densifolium ",FALSE
-"367",105,"14-B-S","14","biocrust","surface","Lepidium densifolium ",FALSE
+"366",105,"14-B-S","14","biocrust","surface","Lepidium densifolium",FALSE
+"367",105,"14-B-S","14","biocrust","surface","Lepidium densifolium",FALSE
 "368",137,"18-B-S","18","biocrust","surface","Agrostis scabra",FALSE
-"369",56,"7-C-5","7","control","5-10","Juncus bufonious ",FALSE
+"369",56,"7-C-5","7","control","5-10","Juncus bufonius",FALSE
 "370",84,"11-D-S","11","dung","surface","Carex praegracilis",FALSE
 "371",74,"10-B-0","10","biocrust","0-5","Carex duriuscula",FALSE
 "372",106,"14-B-0","14","biocrust","0-5","Carex duriuscula",FALSE
 "373",2,"1-B-0","1","biocrust","0-5","Oenothera biennis/villosa",FALSE
 "374",95,"12-C-0","12","control","0-5","Erysimum inconspicuum",FALSE
 "375",4,"1-D-S","1","dung","surface","Calamagrostis canadensis",FALSE
+"376",108,"14-D-S","14","dung","surface","Lepidium densifolium",FALSE
+"377",108,"14-D-S","14","dung","surface","Lepidium densifolium",FALSE
+"378",164,"C4","C4","double_control","double_control","Onagraceae",TRUE
+"379",121,"16-B-S","16","biocrust","surface","Koeleria macrantha",FALSE
