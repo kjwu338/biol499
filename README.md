@@ -29,4 +29,4 @@ Here is the table of contents:
 - [gc_seedtraitsfinal.csv](./6_manualediting/gc_seedtraitsfinal.csv) Generation of trait-related plots and figures
 - [gcspeciestraits_edited.csv](./6_manualediting/gcspeciestraits_edited.csv) Generation of trait-related plots and figures
 ---
-*Last updated: March 10, 2026*
+*Last updated: March 23, 2026*
