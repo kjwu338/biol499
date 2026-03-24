@@ -1,0 +1,284 @@
+---
+title: "biol499script4_abovebelow"
+format: html
+editor: visual
+date-modified: last-modified
+date: today
+author: kwu
+
+
+toc: true
+toc_depth: 3
+---
+
+# Description
+
+Last updated: 03/23/2026 Above belowground comparison; grouping microsite
+
+## load libraries
+
+```{r}
+
+# analysis
+library(glmmTMB) # zero inflated data
+library(lme4) # mixed-effects models
+library(lmerTest) # provide p values for mixed-effect models
+library(dplyr) # summarizing and tranform tables
+library(DHARMa) # testing for zero inflation
+library(tidyr)
+library(car)
+library(here)
+
+# visualization
+
+library(ggplot2)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+
+
+```
+
+## load data
+
+```{r}
+# load data
+gc <- read.csv(here("5_outputtables/gc_wcategories.csv"))
+```
+
+## Above Below Ground
+
+```{r}
+#clean data
+gc_clean <- gc %>%
+  
+  #remove double control
+  filter(microsite_condition != "double_control") %>% 
+  
+  mutate(
+    # create the Above vs Belowground category
+    depth_simple = case_match(surface_depth, 
+                              "surface" ~ "aboveground",
+                              c("0-5", "5-10", "10-May") ~ "belowground"),
+    # set factors and order
+    depth_simple = factor(depth_simple, levels = c("aboveground", "belowground")),
+    microsite_condition = factor(microsite_condition, 
+                                 levels = c("biocrust", "dung", "control")),
+    site = as.factor(site))
+
+# remove non-important columns
+gc_collapsed <- gc_clean %>%
+  group_by(site, microsite_condition, depth_simple, Species) %>% # columns to keep
+  summarise(total_count = n(), .groups = "drop")
+
+  # create blank 120 to account for zero counts
+all_trays_120 <- expand_grid(
+  site = factor(1:20),
+  
+  # set microsite categorical variables
+  microsite_condition = factor(c("dung", "biocrust", "control"), 
+                               # define specific order
+                               levels = c("dung", "biocrust", "control")),
+  
+  # set depth categorical variables
+  depth_simple = factor(c("aboveground", "belowground"), 
+                        levels = c("aboveground", "belowground")))
+
+```
+
+### Abundance
+
+```{r}
+#1. ABUNDANCE/COUNT ------
+
+# STEP 1: clean data ----
+# do not normalize = normalize abundance by volume 
+# aggregate seedling counts by treatment
+
+# join gc_collapse to blank 120 to get seedling counts
+abundance_ab <- all_trays_120 %>%
+  left_join(
+    gc_collapsed %>% 
+      group_by(site, microsite_condition, depth_simple) %>% 
+      summarise(abundance = sum(total_count), .groups = "drop"),
+    by = c("site", "microsite_condition", "depth_simple")
+  ) %>%
+  mutate(abundance = replace_na(abundance, 0),
+         treatment = paste(microsite_condition, depth_simple, sep = "_")
+         )
+
+# STEP 2: run glmm-----
+#attempt 1: failed assumptions : glmer-----
+#model_abundance <- glmer(seedpercm3 ~ microsite_condition * surface_depth + (1 | site), 
+#data = tray_normal)
+
+#anova(model_abundance) # anova table
+#attempt 2: glmmTMB-----this model meets all assumptions----
+model_abundance_ab <- glmmTMB(abundance ~ treatment +
+                               (1|site), 
+                               data = abundance_ab,
+                               family = poisson())
+
+Anova(model_abundance_ab, type = "III") # is this line of code okay? random effect model
+
+# STEP 3: test assumptions ----
+# check normality = right skewed
+hist(abundance_ab$abundance)
+
+#tweedie model passed all assumptions
+simulationOutput_120 <- simulateResiduals(fittedModel = model_abundance_ab)
+
+#dispersion test significant with glmmTB
+plot(simulationOutput_120) 
+testOutliers(simulationOutput_120) # nonsig
+testDispersion(simulationOutput_120)
+```
+
+## graph
+
+```{r}
+
+# Get letters from the model
+emm_counts_ab <- emmeans(model_abundance_ab, ~ treatment, type = "response")
+emm_letters_ab <- as.data.frame(cld(emm_counts_ab, Letters = letters, adjust = "tukey")) %>%
+  mutate(.group = trimws(.group)) %>%
+  # Split "biocrust_aboveground" into two columns for plotting
+  separate(treatment, into = c("microsite_condition", "depth_simple"), sep = "_") %>%
+  mutate(
+    depth_simple = factor(depth_simple, levels = c("aboveground", "belowground")),
+    microsite_condition = factor(microsite_condition, levels = c("dung", "biocrust", "control"))
+  )
+
+# label positions (so letters sit above each box)
+letter_pos_ab <- abundance_ab %>%
+  group_by(microsite_condition, depth_simple) %>%
+  summarise(y_pos = max(abundance, na.rm = TRUE) + 2, .groups = "drop") 
+
+# join letters to their specific positions
+emm_letters_ab <- left_join(emm_letters_ab, letter_pos_ab, by = c("microsite_condition", "depth_simple"))
+
+# ggplot  
+ggplot(abundance_ab, aes(x = microsite_condition, y = abundance, fill = microsite_condition)) +
+  # whiskers
+  stat_boxplot(geom = "errorbar", width = 0.25) +
+  
+  # boxplot
+  geom_boxplot(outlier.shape = 21, width = 0.6, alpha = 0.8) +
+  
+  # significance letters (using the joined y_pos)
+  geom_text(data = emm_letters_ab, 
+            aes(x = microsite_condition, y = y_pos, label = .group),
+            size = 5, fontface = "bold", vjust = 0) +
+  
+  # faceting
+  facet_wrap(~ depth_simple, nrow = 1,
+             labeller = labeller(depth_simple = c("aboveground" = "Aboveground (Surface)", 
+                                                  "belowground" = "Belowground (0-10 cm)"))) +
+  
+  # professional colors
+  scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
+                               "dung" = "#C4944A", 
+                               "control" = "#D4C09A"),
+                    labels = c("Dung", "Biocrust", "Control")) +
+  
+  # labels and theme
+  labs(x = NULL, 
+       y = "Seedling Count (per tray)", 
+       fill = "Microsite") +
+  theme_classic() +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold", size = 13),
+    axis.text.x = element_blank(),   
+    axis.ticks.x = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    text = element_text(size = 12)
+  )
+```
+
+### Richness
+
+```{r}
+# clean data and create species count
+richness_counts_ab <- gc_clean %>%
+  group_by(site, microsite_condition, depth_simple) %>%
+  summarise(
+    richness = n_distinct(Species), 
+    .groups = "drop"
+  )
+
+# join with master list to include empty trays ----
+tray_richness_ab <- all_trays_120 %>%
+  left_join(richness_counts_ab, by = c("site", "microsite_condition", "depth_simple")) %>%
+  mutate(
+    tray = row_number(),
+    richness = replace_na(richness, 0)
+  )
+
+# STEP 3: run glmmTMB for R]richness ----
+# Richness is count data -> poisson + zero Inflation is standard
+model_richness_120 <- glmmTMB(richness ~ microsite_condition * depth_simple +
+                              (1|site), 
+                              data = tray_richness_ab,
+                              ziformula = ~1, 
+                              family = poisson)
+
+Anova(model_richness_120, type = "III")
+
+# STEP 4: test assumptions ----
+sim_richness_120 <- simulateResiduals(model_richness_120)
+plot(sim_richness_120)
+```
+
+### Evenness
+
+```{r}
+
+# calculate shannon h for pielou’s j (evenness) ----
+evenness_ab <- gc_clean %>%
+  # Count each species per microsite/depth combination
+  group_by(site, microsite_condition, depth_simple, Species) %>%
+  summarise(sp_count = n(), .groups = "drop_last") %>%
+  # Calculate proportions based on the NEW collapsed totals
+  mutate(
+    p_i = sp_count / sum(sp_count),
+    ln_p_i = p_i * log(p_i)
+  ) %>%
+  summarise(
+    shannon_h = -sum(ln_p_i),
+    richness_val = n(), 
+    .groups = "drop"
+  ) %>%
+  mutate(
+    evenness = if_else(richness_val > 1, shannon_h / log(richness_val), 0)
+  )
+
+# STEP 2: join with master list to include empty trays ----
+tray_evenness_ab <- all_trays_120 %>%
+  left_join(evenness_ab, by = c("site", "microsite_condition", "depth_simple")) %>%
+  mutate(
+    tray = row_number(),
+    # Beta family cannot handle exactly 0 or 1
+    evenness_raw = case_when(
+      evenness <= 0 ~ 0.001,
+      evenness >= 1 ~ 0.999,
+      TRUE ~ evenness
+    )
+  )
+
+# STEP 3: run glmmTMB for evenness ----
+model_evenness_ab <- glmmTMB(evenness_raw ~ microsite_condition * depth_simple +
+                               (1|site), 
+                              dispformula = ~microsite_condition, 
+                              data = tray_evenness_ab,
+                              family = beta_family())
+
+Anova(model_evenness_ab, type = "II")
+
+# STEP 4: check assumptions -------
+sim_evenness_ab <- simulateResiduals(model_evenness_ab)
+plot(sim_evenness_ab) # residuals are significant
+```
+
+# Microsite

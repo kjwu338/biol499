@@ -1,3 +1,10 @@
+---
+title: "biol499script1_cleandescript"
+format: html
+editor: visual
+---
+
+```{r}
 ##
 #BIOL 499 GC Script 1: Clean Data & Descriptive Analysis
 #Date: 2/11/2026

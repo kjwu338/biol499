@@ -38,15 +38,19 @@ library(ggplot2)
 library(emmeans)
 library(multcomp)
 library(multcompView)
+library(here)
+```
+
+### find wd using here
+```{r}
+
+gc <- read.csv(here("5_outputtables", "gc_wcategories.csv"))
+
 ```
 
 ### Prep data
 
 ```{r}
-# load data
-gc <- read.csv("5_outputtables/gc_wcategories.csv")
-
-#clean data (same between script a & c)
 gc_clean <- gc %>%
   filter(microsite_condition != "double_control") %>%
   mutate(
@@ -67,17 +71,15 @@ all_trays <- expand_grid(
             "control_0-5", "control_5-10")
 ) %>%
   separate(combo, into = c("microsite_condition", "surface_depth"), sep = "_")
-######
 ```
 
 # STATS
 
 ## ABUNDANCE
 
-###Clean data
+### Clean data
 
 ```{r}
-# STEP 1: CLEAN DATA
 # not normalizing abundance by volume (15.71) bc surface treatments are not standarized ----
 # aggregate seedling counts by trays
 tray_counts <- gc_clean %>%
@@ -106,7 +108,7 @@ tray_normal <- tray_normal %>%
   )
 ```
 
-###Run ANOVA/glmm
+### Run ANOVA/glmm
 
 ```{r}
 #attempt 1: failed assumptions : glmer-----
@@ -210,7 +212,9 @@ ggplot(tray_normal, aes(x = microsite_condition, y = total_seeds, fill = microsi
   )
 ```
 
-##RICHNESS ###Clean
+## RICHNESS
+
+### Clean
 
 ```{r}
 richness_counts <- gc_clean %>%
@@ -227,7 +231,7 @@ tray_richness <- all_trays %>%
 
 ```
 
-###Run model
+### Run model
 
 ```{r}
 # Run model with combined treatment
@@ -238,7 +242,7 @@ model_richness <- glmer(richness ~ treatment + (1|site),
 Anova(model_richness, type = "III")
 ```
 
-###Test assumptions ----
+### Test assumptions ----
 
 ```{r}
 sim_richness <- simulateResiduals(model_richness) # non significant/pass assumptions
@@ -373,7 +377,7 @@ model_evenness <- glmmTMB(evenness_raw ~ treatment + (1 | site),
 Anova(model_evenness, type = "III")
 ```
 
-###test assumptions
+### test assumptions
 
 ```{r}
 sim_evenness <- simulateResiduals(model_evenness)

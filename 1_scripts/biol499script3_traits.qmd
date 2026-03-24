@@ -140,7 +140,7 @@ testResiduals(sim_mass) #KS test (Normality), Dispersion test (Variance), Outlie
 
 # 3. Visualization
 
-### CV BAR CHARTs ----
+### Cv Bar Charts ----
 
 ```{r}
 cv_long <- cv_summary %>%
@@ -157,7 +157,7 @@ ggplot(cv_long, aes(x = microsite_condition, y = cv, fill = microsite_condition)
 
 ```
 
-### RAW TRAIT BOXPLOTS ----
+### Raw Trait Boxplots ----
 
 ```{r}
 ggplot(merged_seedling_traits, aes(x = microsite_condition, y = final_mass, fill = microsite_condition)) +
@@ -171,7 +171,7 @@ ggplot(merged_seedling_traits, aes(x = microsite_condition, y = final_mass, fill
 
 ```
 
-### KS Density Plot
+### KS density Plot
 
 ```{r}
 ggplot(merged_seedling_traits %>% filter(microsite_condition %in% c("dung", "biocrust")), 
@@ -184,7 +184,8 @@ ggplot(merged_seedling_traits %>% filter(microsite_condition %in% c("dung", "bio
 
 ```
 
-### CWM Plot
+### CWM plot
+
 ```{r}
 cwm_plot_data <- cwm_tray %>%
   group_by(microsite_condition, surface_depth) %>%
