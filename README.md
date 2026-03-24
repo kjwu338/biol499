@@ -4,7 +4,7 @@ This is the code for my BIOL 499 Project. It includes scripts, raw data and extr
 * gc = growth chamber
 
 `1_scripts/`
-- [biol499script1_clean_descript.qmd](./1_scripts/biol499script1_clean_descript.qmd) Cleaning germination data
+- [biol499script1_clean_descript.qmd](./1_scripts/biol499script1_clean_descript.qmd) Cleaning germination data + basic descriptive statistics
 - [biol499script2_cleanseedtraitforuse.R](./1_scripts/biol499script2_cleanseedtraitforuse.R) Cleaning seed trait data
 - [biol499script3_traits.qmd](./1_scripts/biol499script3_traits.qmd) Statistical analysis of plant traits
 - [biol499script4_univariate8.qmd](./1_scripts/biol499script4_univariate8.qmd) GLMM models for diversity indices - Abundance, Richness, Evenness
