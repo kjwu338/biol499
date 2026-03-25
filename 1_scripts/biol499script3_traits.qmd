@@ -28,6 +28,8 @@ library(glmmTMB)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+
+library(here)
 ```
 
 # 1. Stats
@@ -44,8 +46,8 @@ library(tidyr)
 ## Data Prep
 
 ```{r}
-seedlingdf <- read.csv("6_manualediting/gc_seedtraitsfinal.csv")
-gcseedling <- read.csv("5_outputtables/gc_wcategories.csv")
+seedlingdf <- read.csv(here("6_manualediting", "gc_seedtraitsfinal.csv"))
+gcseedling <- read.csv(here("5_outputtables", "gc_wcategories.csv"))
 
 seedlingdf_clean <- seedlingdf %>%
   mutate(across(everything(), ~ na_if(as.character(.), "n/a"))) %>%
@@ -92,37 +94,45 @@ cwm_tray <- merged_seedling_traits %>%
             cwm_length = mean(final_length, na.rm = TRUE), .groups = "drop")
 ```
 
-### Coefficient of variation
+### KS test
 
 ```{r}
-# 3. testing filtering  ----
-# Coefficient of Variation (CV)
-cv_summary <- trait_descriptive_stats %>%
-  mutate(cv_mass = (sd_mass / mean_mass) * 100,
-         cv_length = (sd_length / mean_length) * 100)
-
 # KS Test for mass (Variety Clumping)
 dung_mass_dist <- merged_seedling_traits %>% filter(microsite_condition == "dung") %>% pull(final_mass) %>% na.omit()
 biocrust_mass_dist <- merged_seedling_traits %>% filter(microsite_condition == "biocrust") %>% pull(final_mass) %>% na.omit()
 ks_result_mass <- ks.test(dung_mass_dist, biocrust_mass_dist)
 ```
 
-### GLMM
+### GLMM mass
 
 ```{r}
+# clean 
+treatment_levels <- c(
+  "biocrust_surface", "dung_surface",
+  "control_0-5",      "biocrust_0-5",     "dung_0-5",
+  "control_5-10",     "biocrust_5-10",    "dung_5-10"
+)
+
+merged_seedling_traits <- merged_seedling_traits %>%
+  mutate(
+    # Create the same treatment strings as your abundance model
+    treatment = paste(microsite_condition, surface_depth, sep = "_"),
+    treatment = factor(treatment, levels = treatment_levels),
+    site = factor(site),
+    Tray.. = factor(Tray..)
+  )
+
 #model_mass <- lmer(final_mass ~ microsite_condition * surface_depth + (1 | site/tray), data = merged_seedling_traits)
 #model_length <- lmer(final_length ~ microsite_condition * surface_depth + (1 | site/tray), data = merged_seedling_traits)
-model_mass <- glmmTMB(final_mass ~ microsite_condition * surface_depth + (1 | site/Tray..),
-        data = merged_seedling_traits,
-        family = Gamma(link = "log"))
-
+model_mass <- glmmTMB(final_mass ~ treatment + (1 | site/Tray..), 
+                          data = merged_seedling_traits, 
+                          family = Gamma(link = "log"))
+summary(model_mass)
+Anova(model_mass, type = "III")
+      
 # Simple Models (Microsite only)
-#model_mass_micro <- lmer(final_mass ~ microsite_condition + (1 | site/tray), data = merged_seedling_traits)
+#model_mass_micro <- lmer(final_mass ~ microsite_condition + (1 | site/Tray..), data = #merged_seedling_traits)
 #model_length_micro <- lmer(final_length ~ microsite_condition + (1 | site/tray), data = merged_seedling_traits)
-
-# Post-hoc Significance Letters
-emm_mass <- emmeans(model_mass_micro, ~ microsite_condition)
-emm_letters_mass <- cld(emm_mass, Letters = letters, adjust = "tukey")
 ```
 
 ## Testing assumptions
@@ -140,20 +150,57 @@ testResiduals(sim_mass) #KS test (Normality), Dispersion test (Variance), Outlie
 
 # 3. Visualization
 
-### Cv Bar Charts ----
+### Coefficient of variation + plot
 
 ```{r}
+cv_summary <- trait_descriptive_stats %>%
+  mutate(cv_mass = (sd_mass / mean_mass) * 100)
+
 cv_long <- cv_summary %>%
-  pivot_longer(cols = c(cv_mass, cv_length), names_to = "trait", values_to = "cv") %>%
-  mutate(trait = recode(trait, "cv_mass" = "Mass CV (%)", "cv_length" = "Length CV (%)"))
+  pivot_longer(cols = c(cv_mass), 
+               names_to = "trait", 
+               values_to = "cv") %>%
+  
+  mutate(trait = case_match(trait,
+                            "cv_mass" ~ "Mass CV (%)"))
 
 ggplot(cv_long, aes(x = microsite_condition, y = cv, fill = microsite_condition)) +
-  geom_col(width = 0.6, alpha = 0.8) +
-  facet_grid(trait ~ surface_depth, scales = "free_y") +
-  scale_fill_manual(values = c("biocrust" = "#8B9E6B", "dung" = "#C4944A", "control" = "#D4C09A")) +
+  geom_col(width = 0.7, alpha = 0.8, color = "white") +
+  
+  # cv values
+  geom_text(aes(label = paste0(round(cv, 1), 
+                               "%\n(n=", n_seedlings, ")")), 
+            vjust = -0.2,    # Adjusts height above bar
+            lineheight = 0.8, # Tightens the space between the two lines
+            size = 3) +
+  
+  # facet = use to create multiple layouts
+  facet_grid(trait ~ surface_depth, scales = "fixed") +
+  
+  scale_y_continuous(limits = c(0, 300), 
+                     breaks = seq(0, 300, 50),
+                     expand = expansion(mult = c(0, 0.15))) +
+  
+  scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
+                               "dung" = "#C4944A", 
+                               "control" = "#D4C09A")) +
+  
+  # graph labels
+  labs(y = "Coefficient of Variation (%)", 
+       fill = "Microsite", 
+       x = NULL) +
+  
+  # theme
   theme_classic() +
-  labs(y = "Coefficient of Variation (%)", fill = "Microsite", x = NULL) +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), legend.position = "bottom")
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(size = 13),
+    axis.text.x = element_blank(),   # Hides labels since colors/legend tell the story
+    axis.ticks.x = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    text = element_text(size = 12)
+  )
 
 ```
 
@@ -161,13 +208,32 @@ ggplot(cv_long, aes(x = microsite_condition, y = cv, fill = microsite_condition)
 
 ```{r}
 ggplot(merged_seedling_traits, aes(x = microsite_condition, y = final_mass, fill = microsite_condition)) +
+  
   stat_boxplot(geom = "errorbar", width = 0.25) +
+  
   geom_boxplot(outlier.shape = 21, width = 0.6, alpha = 0.8) +
+  
+  # facet
   facet_wrap(~ surface_depth) +
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", "dung" = "#C4944A", "control" = "#D4C09A")) +
-  labs(y = "Seed Mass (g)", x = NULL, fill = "Microsite") +
+  
+  # labels
+  labs(y = "Seed Mass (g)", 
+       x = NULL, 
+       fill = "Microsite",
+       caption = "p = 0.56" ) +
+  
+  # theme
   theme_classic() +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), legend.position = "bottom")
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(size = 13),
+    axis.text.x = element_blank(),   # Hides labels since colors/legend tell the story
+    axis.ticks.x = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    text = element_text(size = 12)
+  )
 
 ```
 
@@ -200,5 +266,53 @@ ggplot(cwm_plot_data, aes(x = microsite_condition, y = mean_cwm, fill = microsit
   labs(y = "CWM Seed Mass (g)", x = NULL) +
   theme_classic() + theme(axis.text.x = element_blank(), legend.position = "bottom")
 
+
+```
+
+# Power Analysis
+```{r}
+
+# for regular power analysis; you can use pwr
+# use simr for glmmTMB
+library(simr)
+
+model1 <- lmer(log(final_mass) ~ treatment + (1 | site/Tray..), 
+                    data = merged_seedling_traits)
+
+
+# change effect size
+fixef(model1)["treatmentdung_surface"] # view effect size
+fixef(model1)["treatmentdung_surface"] <- 0.22
+
+# STIMULATE POWER
+# calculate power for current treatment
+powerSim(model1)
+
+# extend model to increase sample size
+
+# 0% power
+print(power_current)
+
+# how many seedlings would I need?
+# power curve stimulates experiment until it has 80% power
+model_for_curve <- lmer(log(final_mass) ~ treatment + (1 | site), 
+                        data = merged_seedling_traits)
+
+# target effect
+# assume 25% is biological significant
+fixef(model_for_curve)["treatmentdung_surface"] <- 0.22
+
+# hypothetically 2000 seedings
+model_ext_n <- extend(model_for_curve, within="site", n=2000)
+
+# run the curve
+plot_curve <- powerCurve(model_ext_n, 
+                         fixed("treatment", "lr"), 
+                         breaks = c(20, 50, 100, 200, 280, 500),
+                         nsim=50)
+
+summary(plot_curve)
+
+plot(plot_curve)
 
 ```

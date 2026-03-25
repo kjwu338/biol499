@@ -42,6 +42,7 @@ library(here)
 ```
 
 ### find wd using here
+
 ```{r}
 
 gc <- read.csv(here("5_outputtables", "gc_wcategories.csv"))
@@ -59,7 +60,7 @@ gc_clean <- gc %>%
                                .default = surface_depth),
     surface_depth = factor(surface_depth, levels = c("surface", "0-5", "5-10")),
     microsite_condition = factor(microsite_condition, 
-                                 levels = c("biocrust", "dung", "control")),
+                                 levels = c("biocrust", "control", "dung")),
     site = as.factor(site)
   )
 
@@ -154,10 +155,11 @@ emm_counts <- emmeans(model_abundance, ~ treatment, type = "response")
 emm_letters <- as.data.frame(cld(emm_counts, Letters = letters, adjust = "tukey")) %>%
   mutate(.group = trimws(.group)) %>%
   # IMPORTANT: Turn "biocrust_surface" back into two columns for the plot
+  
   separate(treatment, into = c("microsite_condition", "surface_depth"), sep = "_") %>%
   mutate(
     surface_depth = factor(surface_depth, levels = c("surface", "0-5", "5-10")),
-    microsite_condition = factor(microsite_condition, levels = c("biocrust", "dung", "control"))
+    microsite_condition = factor(microsite_condition, levels = c("biocrust","control", "dung"))
   )
 
 # STEP 2: calculate label positions
@@ -169,7 +171,7 @@ letter_pos <- tray_normal %>%
 emm_letters <- left_join(emm_letters, letter_pos, by = c("microsite_condition", "surface_depth"))
 
 depth_order <- c("surface", "0-5", "5-10")
-micro_order <- c("dung","biocrust", "control")
+micro_order <- c("biocrust", "control", "dung")
 
 # STEP 3: create the plot 
 ggplot(tray_normal, aes(x = microsite_condition, y = total_seeds, fill = microsite_condition)) +
@@ -194,7 +196,7 @@ ggplot(tray_normal, aes(x = microsite_condition, y = total_seeds, fill = microsi
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
                                "dung" = "#C4944A", 
                                "control" = "#D4C09A"),
-                    labels = c("Dung", "Biocrust", "Control")) +
+                    labels = c("Biocrust", "Control", "Dung")) +
   
   # label
   labs(x = NULL, 
@@ -263,7 +265,7 @@ emm_rich_letters <- as.data.frame(cld(emm_rich, Letters = letters, adjust = "tuk
   separate(treatment, into = c("microsite_condition", "surface_depth"), sep = "_") %>%
   mutate(
     surface_depth = factor(surface_depth, levels = c("surface", "0-5", "5-10")),
-    microsite_condition = factor(microsite_condition, levels = c("biocrust", "dung", "control"))
+    microsite_condition = factor(microsite_condition, levels = c("biocrust", "control", "dung"))
   )
 
 # STEP 2: calculate letter positions
@@ -275,7 +277,7 @@ emm_rich_letters <- left_join(emm_rich_letters, letter_pos_rich,
                               by = c("microsite_condition", "surface_depth"))
 
 depth_order <- c("surface", "0-5", "5-10")
-micro_order <- c("dung", "biocrust", "control")
+micro_order <- c("biocrust", "control", "dung")
 
 # STEP 3: plot richness
 ggplot(tray_richness, aes(x = microsite_condition, y = richness, fill = microsite_condition)) +
@@ -300,7 +302,7 @@ ggplot(tray_richness, aes(x = microsite_condition, y = richness, fill = microsit
   scale_fill_manual(values = c("biocrust" = "#8B9E6B",
                                "dung"      = "#C4944A",
                                "control"   = "#D4C09A"),
-                    labels = c("Dung", "Biocrust", "Control")) +
+                    labels = c("Biocrust", "Control", "Dung")) +
   
   labs(x = NULL, 
        y = "Number of Species", 
@@ -323,10 +325,13 @@ ggplot(tray_richness, aes(x = microsite_condition, y = richness, fill = microsit
 
 ```{r}
 evenness_calc <- gc_clean %>%
+  
   # grouping 
   group_by(site, microsite_condition, surface_depth, Species) %>% 
+  
   # identifying species 
   summarise(sp_count = n(), .groups = "drop_last") %>%
+  
   # calculates relative abundance
   mutate(
     p_i = sp_count / sum(sp_count), 
@@ -395,7 +400,7 @@ emm_even_letters <- as.data.frame(cld(emm_even, Letters = letters, adjust = "tuk
   separate(treatment, into = c("microsite_condition", "surface_depth"), sep = "_") %>%
   mutate(
     surface_depth = factor(surface_depth, levels = c("surface", "0-5", "5-10")),
-    microsite_condition = factor(microsite_condition, levels = c("biocrust", "dung", "control"))
+    microsite_condition = factor(microsite_condition, levels = c("biocrust", "control", "dung"))
   )
 
 # STEP 2: calculate letter positions
@@ -428,7 +433,7 @@ ggplot(tray_evenness %>% filter(!is.na(evenness)),
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
                                "dung" = "#C4944A", 
                                "control" = "#D4C09A"),
-                    labels = c("Biocrust", "Control", "Dung")) +
+                    labels = c("Dung", "Control", "Biocrust")) +
   # keeps scale clean
   scale_y_continuous(limits = c(0, 1.15), breaks = seq(0, 1, 0.2)) +
   labs(x = NULL, y = "Pielou's Evenness (J)", fill = "Microsite") +

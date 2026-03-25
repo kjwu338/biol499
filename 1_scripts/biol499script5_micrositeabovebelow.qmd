@@ -43,10 +43,10 @@ library(multcompView)
 
 ```{r}
 # load data
-gc <- read.csv(here("5_outputtables/gc_wcategories.csv"))
+gc <- read.csv(here("5_outputtables", "gc_wcategories.csv"))
 ```
 
-## Above Below Ground
+##clean data
 
 ```{r}
 #clean data
@@ -63,49 +63,49 @@ gc_clean <- gc %>%
     # set factors and order
     depth_simple = factor(depth_simple, levels = c("aboveground", "belowground")),
     microsite_condition = factor(microsite_condition, 
-                                 levels = c("biocrust", "dung", "control")),
+                                 levels = c("biocrust", "control", "dung")),
     site = as.factor(site))
 
-# remove non-important columns
-gc_collapsed <- gc_clean %>%
-  group_by(site, microsite_condition, depth_simple, Species) %>% # columns to keep
-  summarise(total_count = n(), .groups = "drop")
-
-  # create blank 120 to account for zero counts
-all_trays_120 <- expand_grid(
+  # create blank 100 to account for zero counts
+all_trays_100 <- expand_grid(
   site = factor(1:20),
   
   # set microsite categorical variables
-  microsite_condition = factor(c("dung", "biocrust", "control"), 
-                               # define specific order
-                               levels = c("dung", "biocrust", "control")),
-  
-  # set depth categorical variables
-  depth_simple = factor(c("aboveground", "belowground"), 
-                        levels = c("aboveground", "belowground")))
+  combo = c("biocrust_aboveground", "biocrust_belowground",
+            "dung_aboveground", "dung_belowground",
+            "control_belowground")
+) %>%
+  separate(combo, into = c("microsite_condition", "depth_simple"), sep = "_") %>%
+  mutate(
+    depth_simple = factor(depth_simple, levels = c("aboveground", "belowground")),
+    microsite_condition = factor(microsite_condition, levels = c("biocrust", "control", "dung"))
+  )
 
 ```
+
+## Above Below Ground
 
 ### Abundance
 
 ```{r}
-#1. ABUNDANCE/COUNT ------
-
 # STEP 1: clean data ----
 # do not normalize = normalize abundance by volume 
 # aggregate seedling counts by treatment
 
-# join gc_collapse to blank 120 to get seedling counts
-abundance_ab <- all_trays_120 %>%
-  left_join(
-    gc_collapsed %>% 
-      group_by(site, microsite_condition, depth_simple) %>% 
-      summarise(abundance = sum(total_count), .groups = "drop"),
-    by = c("site", "microsite_condition", "depth_simple")
-  ) %>%
-  mutate(abundance = replace_na(abundance, 0),
-         treatment = paste(microsite_condition, depth_simple, sep = "_")
-         )
+gc_ab <- gc_clean %>%
+  group_by(site, microsite_condition, depth_simple, Species) %>% # columns to keep
+  
+  #abundance: count
+  summarise(total_count = n(), .groups = "drop")
+
+# join gc_ab to blank 100 to get seedling counts
+abundance_ab <- all_trays_100 %>%
+  left_join(gc_ab, by = c("site", "microsite_condition", "depth_simple")) %>% 
+  mutate(
+    total_count = replace_na(total_count, 0),
+    treatment = paste(microsite_condition, depth_simple, sep = "_")
+  )
+         
 
 # STEP 2: run glmm-----
 #attempt 1: failed assumptions : glmer-----
@@ -114,7 +114,7 @@ abundance_ab <- all_trays_120 %>%
 
 #anova(model_abundance) # anova table
 #attempt 2: glmmTMB-----this model meets all assumptions----
-model_abundance_ab <- glmmTMB(abundance ~ treatment +
+model_abundance_ab <- glmmTMB(total_count ~ treatment +
                                (1|site), 
                                data = abundance_ab,
                                family = poisson())
@@ -123,7 +123,7 @@ Anova(model_abundance_ab, type = "III") # is this line of code okay? random effe
 
 # STEP 3: test assumptions ----
 # check normality = right skewed
-hist(abundance_ab$abundance)
+hist(abundance_ab$total_count)
 
 #tweedie model passed all assumptions
 simulationOutput_120 <- simulateResiduals(fittedModel = model_abundance_ab)
@@ -146,19 +146,19 @@ emm_letters_ab <- as.data.frame(cld(emm_counts_ab, Letters = letters, adjust = "
   separate(treatment, into = c("microsite_condition", "depth_simple"), sep = "_") %>%
   mutate(
     depth_simple = factor(depth_simple, levels = c("aboveground", "belowground")),
-    microsite_condition = factor(microsite_condition, levels = c("dung", "biocrust", "control"))
+    microsite_condition = factor(microsite_condition, levels = c("biocrust", "control", "dung"))
   )
 
 # label positions (so letters sit above each box)
 letter_pos_ab <- abundance_ab %>%
   group_by(microsite_condition, depth_simple) %>%
-  summarise(y_pos = max(abundance, na.rm = TRUE) + 2, .groups = "drop") 
+  summarise(y_pos = max(total_count, na.rm = TRUE) + 2, .groups = "drop") 
 
 # join letters to their specific positions
 emm_letters_ab <- left_join(emm_letters_ab, letter_pos_ab, by = c("microsite_condition", "depth_simple"))
 
 # ggplot  
-ggplot(abundance_ab, aes(x = microsite_condition, y = abundance, fill = microsite_condition)) +
+ggplot(abundance_ab, aes(x = microsite_condition, y = total_count, fill = microsite_condition)) +
   # whiskers
   stat_boxplot(geom = "errorbar", width = 0.25) +
   
@@ -168,7 +168,7 @@ ggplot(abundance_ab, aes(x = microsite_condition, y = abundance, fill = microsit
   # significance letters (using the joined y_pos)
   geom_text(data = emm_letters_ab, 
             aes(x = microsite_condition, y = y_pos, label = .group),
-            size = 5, fontface = "bold", vjust = 0) +
+            size = 5, vjust = 0) +
   
   # faceting
   facet_wrap(~ depth_simple, nrow = 1,
@@ -179,7 +179,7 @@ ggplot(abundance_ab, aes(x = microsite_condition, y = abundance, fill = microsit
   scale_fill_manual(values = c("biocrust" = "#8B9E6B", 
                                "dung" = "#C4944A", 
                                "control" = "#D4C09A"),
-                    labels = c("Dung", "Biocrust", "Control")) +
+                    labels = c("Biocrust", "Control", "Dung")) +
   
   # labels and theme
   labs(x = NULL, 
@@ -282,3 +282,54 @@ plot(sim_evenness_ab) # residuals are significant
 ```
 
 # Microsite
+
+```{r}
+# no groups; use raw data frame: gc_clean
+
+# summarize tray level data
+ms <- gc %>%
+  group_by(site, microsite_condition) %>%
+  summarise(
+    total_seedlings = n(), 
+    species_richness = n_distinct(Species), 
+    .groups = "drop"
+  )
+
+# STEP 2: Create a 60-row Master List
+all_microsites <- expand_grid(
+  site = factor(1:20),
+  microsite_condition = c("biocrust", "dung", "control")
+)
+
+df_60 <- all_microsites %>%
+  left_join(ms, by = c("site", "microsite_condition")) %>%
+  mutate(
+    total_seedlings = replace_na(total_seedlings, 0),
+    species_richness = replace_na(species_richness, 0)
+  )
+
+
+```
+
+```{r}
+
+ms_aov <- glmer(total_seedlings ~ microsite_condition +
+                (1|site), 
+                data = df_60,
+                family = poisson()) # for zero-inflated data
+                
+summary(ms_aov)
+
+  
+```
+
+##graph
+
+```{r}
+ggplot(df_60, aes(x = microsite_condition, y = total_seedlings, fill = microsite_condition)) +
+  stat_boxplot(geom = "errorbar", width = 0.2) +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_manual(values = c("biocrust" = "#8B9E6B", "dung" = "#C4944A", "control" = "#D4C09A")) +
+  labs(y = "Total Seedlings (all depths combined)", x = "Microsite") +
+  theme_classic()
+```

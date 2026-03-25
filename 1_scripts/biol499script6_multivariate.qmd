@@ -2,19 +2,20 @@
 title: "biol499script6_multivariate"
 format: html
 editor: visual
+author: kwu
 ---
 
-```{r}
-####
-# BIOL 499 Script 4b: Multivariate analysis eg. Beta Diversity, PERMANOVA, and NMDS
-# Description: NMDS, PERMANOVA, Beta Dispersion
-# last updated: 3/8/2026
-# author: Kelly Wu
-####
+Multivariate analysis eg. Beta Diversity, PERMANOVA, and NMDS
+Description: NMDS, PERMANOVA, Beta Dispersion
+last updated: 3/8/2026
 
-#NMDS VS PERMANOVA
-# NMDS is a visualization tool; shows shape of data
-# PERMANOVA: calculates actual distance between groups
+
+NMDS VS PERMANOVA
+NMDS is a visualization tool; shows shape of data
+PERMANOVA: calculates actual distance between groups
+
+#load libraries
+```{r}
 
 #install.packages("pairwiseAdonis")
 library(dplyr)
@@ -22,12 +23,16 @@ library(ggplot2)
 library(vegan)
 library(tidyr)
 library(ggnewscale)
+library(here)
 #library(pairwiseAdonis) # pairwise PERMANOVA
+```
 
-# STEP 0: Load and clean data
-gc <- read.csv("5_outputtables/gc_wcategories.csv")
+#clean data
+```{r}
 
-#clean data (same between script a, b, c)
+gc <- read.csv(here("5_outputtables","gc_wcategories.csv"))
+
+#clean data 
 # seedings from germination experiment (n = 372)
 gc_clean <- gc %>%
   filter(microsite_condition != "double_control") %>%
@@ -41,6 +46,10 @@ gc_clean <- gc %>%
     site = as.factor(site)
   )
 
+```
+
+
+```{r}
 # create species matrix wide format
 sp_wide <- gc_clean %>%
   # Note: Join by site/cond/depth
@@ -61,8 +70,11 @@ valid_rows <- rowSums(sp_mat) > 0
 sp_mat     <- sp_mat[valid_rows, ]
 meta_perm  <- meta_perm[valid_rows, ]
 
-# STEP 1. MULTIVARIATE ANALYSIS -----
 
+```
+
+# MULTIVARIATE analysis
+```{r}
 # a. ORDINATION CALCs
 sp_mat_sqrt <- sqrt(sp_mat) # sqrt to deemphasis abundant species
 bray_dist   <- vegdist(sp_mat_sqrt, method = "bray") # dissimilarity matrix
@@ -71,7 +83,10 @@ bray_dist   <- vegdist(sp_mat_sqrt, method = "bray") # dissimilarity matrix
 # 3D map of relationships
 nmds_gc <- metaMDS(sp_mat_sqrt, distance = "bray", k = 3, trymax = 100)
 nmds_gc$stress
+```
 
+#visualization
+```{r}
 # b. plot with ggplot----
 # NMDS scores (coordinates)
 nmds_scores <- as.data.frame(scores(nmds_gc, display = "sites"))
@@ -113,7 +128,6 @@ ggplot(plot_data, aes(x = NMDS1, y = NMDS2)) +
     panel.grid.minor = element_blank(),
     aspect.ratio = 1 # NMDS should usually be square
   )
-)
   
   # stress value
   #labs(subtitle = paste0("Stress = ", round(nmds_gc$stress, 3)))

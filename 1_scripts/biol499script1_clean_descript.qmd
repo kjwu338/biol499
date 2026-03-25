@@ -1,23 +1,21 @@
 ---
 title: "biol499script1_cleandescript"
 format: html
-editor: visual
+editor: source
 ---
 
+#load libraries
 ```{r}
-##
-#BIOL 499 GC Script 1: Clean Data & Descriptive Analysis
-#Date: 2/11/2026
-#Description: 
-#Author: Kelly Wu 
-##
-
 # load packages
 library(dplyr)
 library(tidyverse)
 
+```
+
+# read and clean data
+```{r}
 # read data
-df <- read.csv("2_data_raw/gc_seedlingdata.csv") #load data
+df <- read.csv(here("2_data_raw", "gc_seedlingdata.csv")) #load data
 
 # PART 1: clean data ----
 # keep only the first 3 columns 
@@ -37,6 +35,7 @@ df_cleaned <- df %>%
   )
     
 df_cleannames <- df_cleaned %>%
+    filter(microsite_condition != "double_control") %>%
     mutate(
     #recode microsite_condition with full names
     microsite_condition = case_when(
@@ -53,27 +52,36 @@ df_cleannames <- df_cleaned %>%
     )
   ) 
 
-write.csv(df_cleannames, "5_outputtables/gc_wcategories.csv")
+write.csv(df_cleannames, here("5_outputtables", "gc_wcategories.csv"))
+```
 
-# PART 2: Descriptive analysis ----
+# descriptive analysis 
 
-#1) Number of species + count 
+Remove control
+
+# 1. number of species + count
+```{r}
 speciescount <- df_cleannames %>%
   group_by(Species) %>%
-  summarise (
-    count = n()
-  )
+  summarise (count = n())
+
 print(speciescount)
 
-#2) Count per site
+```
+
+# 2. count per site
+```{r}
 sitecount <- df_cleannames %>%
   group_by(site) %>%
   summarise(
     count = n()
   )
-print(sitecount)
 
-#3) gc sample count
+print(sitecount)
+```
+
+# 3. gc sample count
+```{r}
 gctraycount <- df_cleannames %>%
   group_by(Sample) %>%
   summarize(
@@ -81,8 +89,10 @@ gctraycount <- df_cleannames %>%
   )
 
 print(gctraycount)
+```
 
-#4) Group By condition: Tray count, Seedling Count and Species Count
+# 4. group by condition
+```{r}
 intx_trays <- df_cleannames %>%
   group_by(microsite_condition,surface_depth) %>%
   summarize(
@@ -93,9 +103,12 @@ intx_trays <- df_cleannames %>%
 
 print(intx_trays)
 
-write.csv(intx_trays, "5_outputtables/intx_trays.csv")
+write.csv(intx_trays, here("5_outputtables", "intx_trays.csv"))
+```
 
-#5) Group by just microsites
+# 5. Group by just microsites
+
+```{r}
 microsites <- df_cleannames %>%
   group_by(microsite_condition) %>%
   summarize(
@@ -103,9 +116,108 @@ microsites <- df_cleannames %>%
     species_count = n_distinct(Species), 
     tray_count = n_distinct(Sample)
   )
+
 print(microsites)
+```
 
-#Richness per surface depth
+# visualizations
+# Species
+general and group by microsite
+make stacked bar plots for by microsite
 
+## clean data for visualization
+```{r}
 
-#output another dataframe
+#append habit and origin to species 
+spp <- read.csv(here("2_data_raw", "gc_species.csv"))
+
+sppdf <- df_cleannames %>%
+  left_join(spp, by = "Species")
+
+# count species per microsite
+# new row for distinct species for each microsite
+
+sppms <- sppdf %>%
+  group_by(microsite_condition, Species) %>%
+  summarise(
+    count = n(),
+    .groups = "drop"
+  )
+
+```
+### bar plot for nativity per microsite
+```{r}
+
+ggplot(sppms, aes(x = microsite_condition, y = count, fill =
+                    Species)) +
+  geom_col(color = "white", linewidth = 0.2) 
+  
+```
+
+### general species count pie chart
+```{r}
+# organizing species
+
+spp_pie <- sppdf %>%
+  group_by(Species) %>%
+  
+  # figure out top #
+  summarise(count = n(), groups = "drop") %>%
+  
+  mutate(top = fct_lump_n(Species, n = 8, w = count)) %>%
+  
+  # other
+  group_by(top) %>%
+  
+  summarise(total_count = sum(count), .groups = "drop") %>%
+  
+  # order
+  mutate(top = fct_reorder(top, total_count, .desc = TRUE),
+         top = fct_relevel(top, "Other", after = Inf)) %>%
+  arrange(top) %>%
+  
+  # calculate percentages for labels
+  mutate(prop = total_count/sum(total_count),
+         label = scales::percent(prop, accuracy =1))
+
+# donut chart
+ggplot(spp_pie, aes(x = 2, y = total_count, fill = top)) +
+  
+  # stack
+  geom_col(color = "white") +
+  # converts stack to donut
+  coord_polar("y", start = 0) +
+  
+  # create hole
+  xlim(0.5, 2.5) +
+  
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), 
+            size = 4, color = "white", fontface = "bold") +
+  
+  # color
+  scale_fill_viridis_d(option = "turbo", name = "Species") +
+  
+  # theme
+  theme_void() + 
+  theme(legend.text = element_text(face = "italic"), # Italics for Latin names
+        legend.title = element_text(face = "bold"),
+        plot.title = element_text(hjust = 0.5, face = "bold", size = 16)) 
+```
+
+# nativity
+```{r}
+ggplot(sppdf, aes(x = microsite_condition, fill = Origin)) +
+  geom_bar(position = "stack") + # geom_bar counts rows automatically
+  scale_fill_manual(values = c("Native" = "#4E79A7", "Exotic" = "#E15759")) +
+  theme_minimal()
+```
+# habit
+```{r}
+ggplot(sppdf, aes(x = microsite_condition, fill = Habit)) +
+  geom_bar(position = "stack") + # geom_bar counts rows automatically
+  scale_fill_manual(values = c("Forb" = "#4E79A7", "Graminoid" = "#E15759")) +
+  theme_minimal()
+```
+
+# make sankey for connecting above to below
+```{r}
