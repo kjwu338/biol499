@@ -4,6 +4,7 @@ This is the code for my BIOL 499 Project. It includes scripts, raw data and extr
 * gc = growth chamber
 ---
 **I only notated when I thought it was neccessary**
+**NEEDS TO BE UPDATED AS OF 3/23/2026 DUE TO .qmd integration**
 ---
 Here is the table of contents: 
 
